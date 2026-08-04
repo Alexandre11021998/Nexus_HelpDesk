@@ -1,0 +1,66 @@
+{% extends 'tickets/base.html' %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                <h4 class="mb-0">#{{ ticket.id }} - {{ ticket.titulo }}</h4>
+                <span class="badge bg-primary">{{ ticket.get_status_display }}</span>
+            </div>
+            <div class="card-body">
+                <p class="text-muted small">Aberto por <strong>{{ ticket.empresa.nome_fantasia }}</strong> em {{ ticket.data_criacao|date:"d/m/Y às H:i" }}</p>
+                <hr>
+                <p style="white-space: pre-line;">{{ ticket.descricao }}</p>
+            </div>
+        </div>
+
+        <h5 class="mb-3">Histórico e Comentários</h5>
+        {% for comentario in comentarios %}
+            <div class="card mb-3 {% if comentario.autor.is_staff %}border-primary{% endif %}">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <strong>
+                            {{ comentario.autor.username }}
+                            {% if comentario.autor.is_staff %}
+                                <span class="badge bg-primary ms-1">Suporte Técnico</span>
+                            {% endif %}
+                        </strong>
+                        <small class="text-muted">{{ comentario.data_envio|date:"d/m/Y H:i" }}</small>
+                    </div>
+                    <p class="mb-0">{{ comentario.texto }}</p>
+                </div>
+            </div>
+        {% empty %}
+            <p class="text-muted">Nenhum comentário registrado ainda.</p>
+        {% endfor %}
+
+        <div class="card shadow-sm mt-4">
+            <div class="card-body">
+                <h6>Adicionar Resposta</h6>
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        {{ form.texto }}
+                    </div>
+                    <button type="submit" class="btn btn-primary">Enviar Comentário</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card shadow-sm">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">Detalhes</h5>
+            </div>
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item"><strong>Empresa:</strong> {{ ticket.empresa.nome_fantasia }}</li>
+                <li class="list-group-item"><strong>CNPJ:</strong> {{ ticket.empresa.cnpj }}</li>
+                <li class="list-group-item"><strong>Prioridade:</strong> {{ ticket.get_prioridade_display }}</li>
+                <li class="list-group-item"><strong>Última Atualização:</strong> {{ ticket.data_atualizacao|date:"d/m/Y H:i" }}</li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,55 @@
+{% extends 'tickets/base.html' %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Seus Tickets de Suporte</h2>
+    <a href="{% url 'criar_ticket' %}" class="btn btn-primary">+ Abrir Novo Ticket</a>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead>
+                    <tr>
+                        <th>#ID</th>
+                        <th>Título</th>
+                        <th>Prioridade</th>
+                        <th>Status</th>
+                        <th>Data</th>
+                        <th>Ação</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for ticket in tickets %}
+                    <tr>
+                        <td><strong>#{{ ticket.id }}</strong></td>
+                        <td>{{ ticket.titulo }}</td>
+                        <td><span class="badge bg-secondary">{{ ticket.get_prioridade_display }}</span></td>
+                        <td>
+                            {% if ticket.status == 'ABERTO' %}
+                                <span class="badge bg-danger">Aberto</span>
+                            {% elif ticket.status == 'EM_ANDAMENTO' %}
+                                <span class="badge bg-warning text-dark">Em Andamento</span>
+                            {% elif ticket.status == 'RESOLVIDO' %}
+                                <span class="badge bg-success">Resolvido</span>
+                            {% else %}
+                                <span class="badge bg-dark">{{ ticket.get_status_display }}</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ ticket.data_criacao|date:"d/m/Y H:i" }}</td>
+                        <td>
+                            <a href="{% url 'detalhe_ticket' pk=ticket.pk %}" class="btn btn-sm btn-outline-primary">Ver Chamado</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center text-muted py-4">Nenhum ticket aberto no momento.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

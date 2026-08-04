@@ -1,0 +1,34 @@
+{% extends 'tickets/base.html' %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow-sm">
+            <div class="card-header bg-white">
+                <h4 class="mb-0">Abrir Novo Ticket</h4>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label">Título</label>
+                        {{ form.titulo }}
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Prioridade</label>
+                        {{ form.prioridade }}
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Descrição do Problema</label>
+                        {{ form.descricao }}
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'lista_tickets' %}" class="btn btn-secondary">Cancelar</a>
+                        <button type="submit" class="btn btn-success">Enviar Ticket</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
