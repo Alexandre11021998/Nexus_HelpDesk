@@ -1,7 +1,19 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from .models import Ticket
-from .forms import TicketForm, ComentarioForm
+from .forms import EmpresaCadastroForm, TicketForm, ComentarioForm
+
+def cadastrar_empresa(request):
+    if request.method == 'POST':
+        form = EmpresaCadastroForm(request.POST)
+        if form.is_valid():
+            empresa = form.save()
+            #Efetua o login automático
+            login(request, empresa.usuario)
+            return redirect('lista_tickets')
+    else:
+        form = EmpresaCadastroForm()
+    return render(request, 'tickets/cadastrar_empresa.html', {'form': form})
 
 @login_required
 def lista_tickets(request):
