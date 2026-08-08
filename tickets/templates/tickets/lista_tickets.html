@@ -1,18 +1,81 @@
 {% extends 'tickets/base.html' %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-3">
+<div class="d-flex justify-content-between align-items-center mb-4">
     <h2>Seus Tickets de Suporte</h2>
-    <a href="{% url 'criar_ticket' %}" class="btn btn-primary">+ Abrir Novo Ticket</a>
+    {% if not user.is_staff %}
+    <a href="{% url 'criar_ticket'%}" class="btn btn-primary">+ Abrir Novo Ticket</a>
+    {% endif %}
 </div>
 
-<div class="card shadow-sm">
+<!-- Cards de Métricas -->
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="card border-0 bg-primary text-white shadow-sm">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-subtitle text-white-50 mb-1">Total de Tickets</h6>
+                        <h3 class="card-title mb-0 fw-bold">{{ metricas.total }}</h3>
+                    </div>
+                    <span class="fs-1 text-white-50"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card border-0 bg-danger text-white shadow-sm">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-subtitle text-white-50 mb-1">Abertos</h6>
+                        <h3 class="card-title mb-0 fw-bold">{{ metricas.abertos }}</h3>
+                    </div>
+                    <span class="fs-1 text-white-50">🚨</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card border-0 bg-warning text-dark shadow-sm">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-subtitle text-dark-50 mb-1">Em Andamento</h6>
+                        <h3 class="card-title mb-0 fw-bold">{{ metricas.em_andamento }}</h3>
+                    </div>
+                    <span class="fs-1 text-dark-50">⏳</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card border-0 bg-success text-white shadow-sm">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-subtitle text-white-50 mb-1">Resolvidos</h6>
+                        <h3 class="card-title mb-0 fw-bold">{{ metricas.resolvidos }}</h3>
+                    </div>
+                    <span class="fs-1 text-white-50">✅</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Tabela de Chamados -->
+<div class="card shadow-sm border-0">
     <div class="card-body">
         <div class="table-responsive">
-            <table class="table table-hover align-middle">
-                <thead>
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
                     <tr>
                         <th>#ID</th>
+                        {% if user.is_staff %}<th>Empresa</th>{% endif %}
                         <th>Título</th>
                         <th>Prioridade</th>
                         <th>Status</th>
@@ -24,6 +87,9 @@
                     {% for ticket in tickets %}
                     <tr>
                         <td><strong>#{{ ticket.id }}</strong></td>
+                        {% if user.is_staff %}
+                            <td>{{ ticket.empresa.nome_fantasia }}</td>
+                        {% endif %}
                         <td>{{ ticket.titulo }}</td>
                         <td><span class="badge bg-secondary">{{ ticket.get_prioridade_display }}</span></td>
                         <td>
@@ -44,7 +110,7 @@
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="6" class="text-center text-muted py-4">Nenhum ticket aberto no momento.</td>
+                        <td colspan="7" class="text-center text-muted py-4">Nenhum ticket encontrado no momento.</td>
                     </tr>
                     {% endfor %}
                 </tbody>

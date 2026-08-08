@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from .models import Ticket
 from .forms import EmpresaCadastroForm, TicketForm, ComentarioForm
+from django.db.models import Count, Q
 
 def cadastrar_empresa(request):
     if request.method == 'POST':
@@ -19,12 +20,27 @@ def cadastrar_empresa(request):
 def lista_tickets(request):
     #Apenas tickets do usuário logado e pertencentes a empresa
     if hasattr(request.user, 'empresa'):
-        tickets = Ticket.objects.filter(usuario=request.user, empresa=request.user.empresa).order_by('-data_criacao')
-
+        base_tickets = Ticket.objects.filter(empresa=request.user.empresa)
+    elif request.user.is_staff:
+        base_tickets = Ticket.objects.all()
     else:
-        tickets = Ticket.objects.filter.none()
+        base_tickets = Ticket.objects.none()
 
-    return render(request, 'tickets/lista_tickets.html', {'tickets': tickets})
+    #Ordenação final da tabela
+    tickets = base_tickets.order_by('-data_criacao')
+    #Métricas para cards
+    metricas = base_tickets.aggregate(
+        total=Count('id'),
+        abertos=Count('id', filter=Q(status='ABERTO')),
+        em_andamento=Count('id', filter=Q(status='EM_ANDAMENTO')),
+        aguardando=Count('id', filter=Q(status='AGUARDANDO')),
+        resolvidos=Count('id', filter=Q(status='RESOLVIDO')),
+    )
+
+    return render(request, 'tickets/lista_tickets.html', {
+        'tickets': tickets,
+        'metricas': metricas
+    })
 
 @login_required
 def criar_ticket(request):
