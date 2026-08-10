@@ -17,6 +17,13 @@
                         Olá, <strong>{{ user.username }}</strong> 
                         {% if user.is_staff %}(Admin){% endif %}
                     </span>
+
+                    {% if user.is_staff %}
+                        <a class="btn btn-outline-warning btn-sm me-2" href="{% url 'painel_suporte' %}">
+                            Central do Agente
+                        </a>
+                    {% endif %}
+
                     <form method="post" action="{% url 'logout' %}" class="d-inline">
                         {% csrf_token %}
                         <button type="submit" class="btn btn-outline-light btn-sm">Sair</button>

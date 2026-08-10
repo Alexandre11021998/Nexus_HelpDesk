@@ -1,0 +1,101 @@
+{% extends 'tickets/base.html' %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="fw-bold mb-1">Central de Atendimento - NexusHelp</h2>
+        <p class="text-muted mb-0">Gerencie e responda às solicitações de suporte das empresas</p>
+    </div>
+</div>
+
+<!-- Filtros Rápidos de Atendimento -->
+<div class="mb-4 d-flex gap-2 flex-wrap">
+    <a href="?status=TODOS" class="btn {% if status_filtro == 'TODOS' %}btn-dark{% else %}btn-outline-dark{% endif %}">
+        Todos <span class="badge bg-secondary ms-1">{{ contadores.todos }}</span>
+    </a>
+    <a href="?status=ABERTO" class="btn {% if status_filtro == 'ABERTO' %}btn-danger{% else %}btn-outline-danger{% endif %}">
+        Abertos <span class="badge bg-danger ms-1">{{ contadores.aberto }}</span>
+    </a>
+    <a href="?status=EM_ANDAMENTO" class="btn {% if status_filtro == 'EM_ANDAMENTO' %}btn-warning text-dark{% else %}btn-outline-warning text-dark{% endif %}">
+        Em Andamento <span class="badge bg-warning text-dark ms-1">{{ contadores.em_andamento }}</span>
+    </a>
+    <a href="?status=AGUARDANDO_CLIENTE" class="btn {% if status_filtro == 'AGUARDANDO_CLIENTE' %}btn-info text-white{% else %}btn-outline-info{% endif %}">
+        Aguardando Cliente <span class="badge bg-info text-white ms-1">{{ contadores.aguardando }}</span>
+    </a>
+    <a href="?status=RESOLVIDO" class="btn {% if status_filtro == 'RESOLVIDO' %}btn-success{% else %}btn-outline-success{% endif %}">
+        Resolvidos <span class="badge bg-success ms-1">{{ contadores.resolvido }}</span>
+    </a>
+</div>
+
+<!-- Fila de Tickets -->
+<div class="card shadow-sm border-0">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th class="ps-3">Prioridade</th>
+                        <th>#ID</th>
+                        <th>Empresa</th>
+                        <th>Assunto</th>
+                        <th>Data Abertura</th>
+                        <th>Status Atual</th>
+                        <th class="text-end pe-3">Ação</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for ticket in tickets %}
+                    <tr>
+                        <td class="ps-3">
+                            {% if ticket.prioridade == 'CRITICA' %}
+                                <span class="badge bg-danger">Crítica</span>
+                            {% elif ticket.prioridade == 'ALTA' %}
+                                <span class="badge bg-warning text-dark">Alta</span>
+                            {% elif ticket.prioridade == 'MEDIA' %}
+                                <span class="badge bg-info text-white">Média</span>
+                            {% else %}
+                                <span class="badge bg-secondary">Baixa</span>
+                            {% endif %}
+                        </td>
+                        <td><strong>#{{ ticket.id }}</strong></td>
+                        <td>
+                            <strong>{{ ticket.empresa.nome_fantasia }}</strong><br>
+                            <small class="text-muted">{{ ticket.empresa.telefone|default:"Sem telefone" }}</small>
+                        </td>
+                        <td>
+                            <a href="{% url 'detalhe_ticket' pk=ticket.pk %}" class="text-decoration-none fw-bold text-dark">
+                                {{ ticket.titulo }}
+                            </a>
+                        </td>
+                        <td><small>{{ ticket.data_criacao|date:"d/m/Y H:i" }}</small></td>
+                        <td>
+                            <!-- Altera o status direto na linha -->
+                            <form method="post" class="d-flex align-items-center gap-1">
+                                {% csrf_token %}
+                                <input type="hidden" name="ticket_id" value="{{ ticket.id }}">
+                                <select name="status" class="form-select form-select-sm" onchange="this.form.submit()">
+                                    {% for val, label in status_choices %}
+                                        <option value="{{ val }}" {% if ticket.status == val %}selected{% endif %}>{{ label }}</option>
+                                    {% endfor %}
+                                </select>
+                            </form>
+                        </td>
+                        <td class="text-end pe-3">
+                            <a href="{% url 'detalhe_ticket' pk=ticket.pk %}" class="btn btn-sm btn-primary">
+                                Responder 
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center text-muted py-5">
+                            Nenhum ticket encontrado nesta fila de atendimento.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

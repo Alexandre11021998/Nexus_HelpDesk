@@ -1,5 +1,7 @@
 from django import forms
+from django.contrib.auth.models import User
 from .models import Empresa, Ticket, Comentario
+
 
 class TicketForm(forms.ModelForm):
     class Meta:
@@ -11,6 +13,7 @@ class TicketForm(forms.ModelForm):
             'prioridade': forms.Select(attrs={'class': 'form-select'}),
         }
 
+
 class ComentarioForm(forms.ModelForm):
     class Meta:
         model = Comentario
@@ -18,19 +21,30 @@ class ComentarioForm(forms.ModelForm):
         widgets = {
             'texto': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Adicione um comentário ou resposta'}),
         }
-# --- Formulario de Cadastro  ---
+
+
+# --- FORMULÁRIO DE ATUALIZAÇÃO DE STATUS DE TICKET ---
+class TicketStatusForm(forms.ModelForm):
+    class Meta:
+        model = Ticket
+        fields = ['status']
+        widgets = {
+            'status': forms.Select(attrs={'class': 'form-select form-select-sm'}),
+        }
+
+
+# --- FORMULÁRIO DE CADASTRO DE EMPRESA ---
 class EmpresaCadastroForm(forms.ModelForm):
     username = forms.CharField(
-        label = 'Nome de usuário (Lgoin)',
+        label='Nome de usuário (Login)',
         widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'usuario_empresa'})
     )
     email = forms.EmailField(
-        label = 'Email de contato',
-        widget=forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'contato@empresa.com' })
-
+        label='Email de contato',
+        widget=forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'contato@empresa.com'})
     )
     password = forms.CharField(
-        label = 'Senha',
+        label='Senha',
         widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Sua senha de acesso'})
     )
 
@@ -38,10 +52,10 @@ class EmpresaCadastroForm(forms.ModelForm):
         model = Empresa
         fields = ['nome_fantasia', 'cnpj', 'telefone']
         widgets = {
-            'nome_fantasia': forms.TextInput(attrs ={'class': 'form-control', 'placeholder': 'Razão social ou Nome Fantasia da empresa'}),
-            'cnpj': forms.TextInput(attrs= {'class': 'form-control', 'placeholder': '00.000.000/0001-00'}),
+            'nome_fantasia': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Razão social ou Nome Fantasia da empresa'}),
+            'cnpj': forms.TextInput(attrs={'class': 'form-control', 'placeholder': '00.000.000/0001-00'}),
             'telefone': forms.TextInput(attrs={'class': 'form-control', 'placeholder': '(11) 99999-9999'}),
-            }
+        }
 
     def save(self, commit=True):
         # 1. Cria o usuário
