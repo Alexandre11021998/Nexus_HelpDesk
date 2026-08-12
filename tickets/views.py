@@ -4,6 +4,7 @@ from .models import Ticket
 from .forms import EmpresaCadastroForm, TicketForm, ComentarioForm, TicketStatusForm    
 from django.db.models import Count, Q
 from django.contrib.admin.views.decorators import staff_member_required
+from django.contrib.auth import login
 
 @staff_member_required
 def painel_suporte(request):

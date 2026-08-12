@@ -15,11 +15,12 @@
                     </div>
                 {% endif %}
 
-                <form method="post">
+                <!-- Proteção contra submissão múltipla -->
+                <form method="post" onsubmit="this.querySelector('button[type=submit]').disabled = true;">
                     {% csrf_token %}
                     <div class="mb-3">
                         <label class="form-label">Usuário</label>
-                        <input type="text" name="username" class="form-control" placeholder="Seu nome de usuário" required>
+                        <input type="text" name="username" class="form-control" placeholder="Seu nome de usuário" required autofocus>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Senha</label>
